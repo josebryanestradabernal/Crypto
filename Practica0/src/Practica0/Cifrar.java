@@ -5,18 +5,12 @@
  */
 package Practica0;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -50,12 +44,30 @@ public class Cifrar {
         PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
         this.PublicKey = publicKey;
     }
-    public String Cipher(String plain) throws NoSuchAlgorithmException,NoSuchPaddingException, InvalidKeyException,IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException, UnsupportedEncodingException, NoSuchProviderException {
+    
+    public void setPrivateKeyString(String key) throws NoSuchAlgorithmException, InvalidKeySpecException{
+        
+        byte[] encodedPrivateKey = stringToBytes(key);
+        
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
+        PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
+        this.PrivateKey = privateKey;
+    }
+    public String Cipher(String plain,String tipo) throws NoSuchAlgorithmException,NoSuchPaddingException, InvalidKeyException,IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException, UnsupportedEncodingException, NoSuchProviderException {
 
         byte[] encryptedBytes; 
   
         Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.ENCRYPT_MODE, this.PublicKey);
+        if(tipo.equals("public")){
+            System.out.println("public");
+            cipher.init(Cipher.ENCRYPT_MODE, this.PublicKey);
+        }
+            
+        else{
+            System.out.println("private");
+            cipher.init(Cipher.ENCRYPT_MODE, this.PrivateKey);
+        }
         encryptedBytes = cipher.doFinal(plain.getBytes());
 
         return bytesToString(encryptedBytes);
@@ -65,6 +77,11 @@ public class Cifrar {
     public void openFromDiskPublicKey(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         String content = this.readFileAsString(path);
         this.setPublicKeyString(content);
+    }
+    
+    public void openFromDiskPrivateKey(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        String content = this.readFileAsString(path);
+        this.setPrivateKeyString(content);
     }
     
     public String readFileAsString(String filePath) throws IOException {

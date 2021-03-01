@@ -5,10 +5,14 @@
  */
 package Practica0;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.security.NoSuchAlgorithmException;
@@ -18,6 +22,7 @@ import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -26,12 +31,17 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class Interfaz extends javax.swing.JFrame {
 
-    private String path_private =  "./claves/private.pri";
-    private String path_public = "./claves/publica.pub";
+    private String path_private_Alicia =  "./claves/Alicia_pri.pri";
+    private String path_public_Alicia = "./claves/Alicia_pub.pub";
+    private String path_private_Betito =  "./claves/Betito_pri.pri";
+    private String path_public_Betito = "./claves/Betito_pub.pub";
+    private String path_private_Eva =  "./claves/Eva_pri.pri";
+    private String path_public_Eva = "./claves/Eva_pub.pub";
     private String texto=""; 
     private String nameFile="";
     GenerarClaves gen = new GenerarClaves();
     Cifrar cif = new Cifrar();
+    Descifrar des = new Descifrar();
     /**
      
      */
@@ -39,13 +49,46 @@ public class Interfaz extends javax.swing.JFrame {
         initComponents();
         //si no existen los ficheros de las llaves lo crea para poder decifrar
         
-        if (!(new File("./claves/private.pri").exists())){
+        //if (!(new File("./claves/private.pri").exists())){
         
-                gen.genKeyPair(512);
+           gen.genKeyPair(512);
+           gen.saveToDiskPrivateKey(path_private_Alicia);
+           gen.saveToDiskPublicKey(path_public_Alicia);
            
-           gen.saveToDiskPrivateKey(path_private);
-           gen.saveToDiskPublicKey(path_public);
-        }
+           gen.genKeyPair(512);
+           gen.saveToDiskPrivateKey(path_private_Betito);
+           gen.saveToDiskPublicKey(path_public_Betito);
+           
+           gen.genKeyPair(512);
+           gen.saveToDiskPrivateKey(path_private_Eva);
+           gen.saveToDiskPublicKey(path_public_Eva);
+        //}
+    }
+    
+    public String getRuta(){
+        String seleccion = (String)this.nombres.getSelectedItem();
+        String ruta = "";
+        switch(seleccion){
+            case "Alicia":
+                if(this.tipo.getSelectedItem().equals("public"))
+                    ruta = path_public_Alicia;
+                if(this.tipo.getSelectedItem().equals("private"))
+                    ruta = path_private_Alicia;
+                break;
+            case "Betito":
+                if(this.tipo.getSelectedItem().equals("public"))
+                    ruta = path_public_Betito;
+                if(this.tipo.getSelectedItem().equals("private"))
+                    ruta = path_private_Betito;
+                break;
+            case "Eva":
+                if(this.tipo.getSelectedItem().equals("public"))
+                    ruta = path_public_Eva;
+                if(this.tipo.getSelectedItem().equals("private"))
+                    ruta = path_private_Eva;
+                break;
+            }
+        return ruta;
     }
 
     /**
@@ -62,11 +105,13 @@ public class Interfaz extends javax.swing.JFrame {
         jTextArea1 = new javax.swing.JTextArea();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        nombres = new javax.swing.JComboBox<>();
+        tipo = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(87, 185, 0));
 
-        jButton1.setText("Abrir Fichero");
+        jButton1.setText("Open File");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -77,44 +122,60 @@ public class Interfaz extends javax.swing.JFrame {
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
-        jButton2.setText("Cifrar");
+        jButton2.setText("Encrypt");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
 
-        jButton3.setText("Decifrar");
+        jButton3.setText("Decrypt");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+
+        nombres.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Alicia", "Betito", "Eva" }));
+
+        tipo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "public", "private" }));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(nombres, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(tipo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jButton1)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(jButton2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(43, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(32, 32, 32)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(nombres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(31, 31, 31)
-                        .addComponent(jScrollPane1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(51, 51, 51)
                         .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(27, 27, 27)
                         .addComponent(jButton3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 149, Short.MAX_VALUE)
-                        .addComponent(jButton1)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(20, 20, 20))
         );
 
@@ -138,24 +199,60 @@ public class Interfaz extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
         }
-       this.jTextArea1.setText(texto); ; 
+       this.jTextArea1.setText(texto); 
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         try {
-            cif.openFromDiskPublicKey(path_public);
+            String ruta = getRuta();
             Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("./mensaje/"
                     +nameFile+"_C.txt"), "UTF-8"));
-            out.write(cif.Cipher(texto));
+            if(ruta.contains("pri")){
+                cif.openFromDiskPrivateKey(ruta);//privada
+                out.write(cif.Cipher(texto,"private"));
+            }
+            else{
+                cif.openFromDiskPublicKey(ruta);//publica
+                out.write(cif.Cipher(texto,"public"));
+            }
             out.close();
+            JOptionPane.showOptionDialog(rootPane,"The file has been encrypted successfully ","Confirm message",JOptionPane.OK_OPTION,JOptionPane.INFORMATION_MESSAGE,null, 
+                new String[]{"Acept"},"default");
+            
         } catch (Exception ex) {
-
+            JOptionPane.showOptionDialog(rootPane,"Encryption error","Error message",JOptionPane.OK_OPTION,JOptionPane.INFORMATION_MESSAGE,null, 
+                new String[]{"Acept"},"default");
             System.out.println(ex);
         }
         
-        
-        
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        try{
+            String ruta = getRuta();
+            String textoDescifrado="";
+            if(ruta.contains("pri")){
+                des.openFromDiskPrivateKey(ruta);//privada
+                textoDescifrado = des.decifrar(this.jTextArea1.getText(),"private");
+            }
+            else{
+                des.openFromDiskPublicKey(ruta);//publica
+                textoDescifrado = des.decifrar(this.jTextArea1.getText(),"public");
+            }
+            
+            Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("./mensaje/"
+                    +nameFile+"_D.txt"),"UTF-8"));
+            out.write(textoDescifrado);
+            out.close();
+            JOptionPane.showOptionDialog(rootPane,"The file has been decrypted successfully ","Confirm message",JOptionPane.OK_OPTION,JOptionPane.INFORMATION_MESSAGE,null, 
+                new String[]{"Acept"},"default");
+            this.jTextArea1.setText(textoDescifrado);
+        }catch(Exception ex){
+            JOptionPane.showOptionDialog(rootPane,"Decryption error","Error message",JOptionPane.OK_OPTION,JOptionPane.INFORMATION_MESSAGE,null, 
+                new String[]{"Acept"},"default");
+            System.out.println(ex);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -202,5 +299,7 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JComboBox<String> nombres;
+    private javax.swing.JComboBox<String> tipo;
     // End of variables declaration//GEN-END:variables
 }
