@@ -48,8 +48,8 @@ public class Interfaz extends javax.swing.JFrame {
     public Interfaz() throws Exception{
         initComponents();
         //si no existen los ficheros de las llaves lo crea para poder decifrar
-        
-        //if (!(new File("./claves/private.pri").exists())){
+        System.out.print(new File("./claves/private.pri").exists());
+        if (!(new File(path_private_Alicia).exists())){
         
            gen.genKeyPair(512);
            gen.saveToDiskPrivateKey(path_private_Alicia);
@@ -62,7 +62,7 @@ public class Interfaz extends javax.swing.JFrame {
            gen.genKeyPair(512);
            gen.saveToDiskPrivateKey(path_private_Eva);
            gen.saveToDiskPublicKey(path_public_Eva);
-        //}
+        }
     }
     
     public String getRuta(){
@@ -118,6 +118,7 @@ public class Interfaz extends javax.swing.JFrame {
             }
         });
 
+        jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
