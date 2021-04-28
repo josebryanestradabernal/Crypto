@@ -13,7 +13,8 @@ class Vigenere (object):
         self.c=""
         k=len(self.key)
         for i in range(len(self.m)):
-            self.c+= chr((((ord(self.m[i])-65)+(ord(self.key[i%k])-65))%26)+65)
+            self.c+= chr((((ord(self.m[i])-65)+
+            (ord(self.key[i%k])-65))%26)+65)
         print("Encrypt : ",self.c)
         return self.c
 
@@ -25,9 +26,12 @@ class Vigenere (object):
         self.m=""
         k=len(unkey)
         for i in range(len(self.c)):
-            self.m+= chr((((ord(self.c[i])-65)+(ord(unkey[i%k])-65))%26)+65)
+            self.m+= chr((((ord(self.c[i])-65)+
+            (ord(unkey[i%k])-65))%26)+65)
         print("Decrypt: ",self.m)
         return self.m
+
+
 if __name__ == "__main__": 
     vig = Vigenere("TROYA","HABILIDOSO")
     c=vig.Encrypt()
